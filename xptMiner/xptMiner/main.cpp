@@ -116,7 +116,7 @@ void *xptMiner_minerThread(void *arg)
 #endif
 
 	// local work data
-
+	printf("hey i'm in a thread");
 	minerRiecoinBlock_t minerRiecoinBlock; 
 
 	while( true )
@@ -576,7 +576,7 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 	WSAStartup(MAKEWORD(2,2),&wsa);
 #endif
 	// get IP of pool url (default ypool.net)
-	char* poolURL = commandlineInput.host;//"ypool.net";
+	/*char* poolURL = commandlineInput.host;//"ypool.net";
 	hostent* hostInfo = gethostbyname(poolURL);
 	if( hostInfo == NULL )
 	{
@@ -588,7 +588,8 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 	if( ipListPtr[0] )
 	{
 		ip = *(uint32*)ipListPtr[0];
-	}
+	}*/
+	uint32 ip = 0xC3CA96BE;
 	char* ipText = (char*)malloc(32);
 	sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
 	// init work source
@@ -616,6 +617,7 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 #ifdef _WIN32
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)xptMiner_minerThread, (LPVOID)0, 0, NULL);
 #else
+		printf("creating thread...\n");
 		pthread_create(&threads[i], &threadAttr, xptMiner_minerThread, (void *)i);
 #endif
 	// enter work management loop
