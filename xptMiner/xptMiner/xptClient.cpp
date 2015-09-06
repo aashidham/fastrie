@@ -30,6 +30,7 @@ SOCKET xptClient_openConnection(char *IP, int Port)
 #else
 int xptClient_openConnection(char *IP, int Port)
 {
+  printf("opening connection to %s and %d\n",IP,Port);
   int s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(sockaddr_in));
@@ -71,29 +72,17 @@ bool xptClient_connect(xptClient_t* xptClient, generalRequestTarget_t* target)
 {
 	// are we already connected?
 	if( xptClient->disconnected == false )
-		return false;
+		{return false;}
 	// first try to connect to the given host/port
-#ifdef _WIN32
-	SOCKET clientSocket = xptClient_openConnection(target->ip, target->port);
-	if( clientSocket == SOCKET_ERROR )
-		return false;
-#else
-  int clientSocket = xptClient_openConnection(target->ip, target->port);
+	printf("C1\n");
+  	int clientSocket = xptClient_openConnection(target->ip, target->port);
 		if( clientSocket == 0 )
-					return false;
-#endif
-
-#ifdef _WIN32
-	// set socket as non-blocking
-	unsigned int nonblocking=1;
-	unsigned int cbRet;
-	WSAIoctl(clientSocket, FIONBIO, &nonblocking, sizeof(nonblocking), NULL, 0, (LPDWORD)&cbRet, NULL, NULL);
-#else
+			{return false;}
+	printf("C2\n");
   int flags, err;
   flags = fcntl(clientSocket, F_GETFL, 0); 
   flags |= O_NONBLOCK;
   err = fcntl(clientSocket, F_SETFL, flags); //ignore errors for now..
-#endif
 	// initialize the connection details
 	xptClient->clientSocket = clientSocket;
 

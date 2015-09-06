@@ -106,15 +106,8 @@ void xptMiner_submitShare(minerRiecoinBlock_t* block, uint8* nOffset)
 	LeaveCriticalSection(&cs_xptClient);
 }
 
-#ifdef _WIN32
-int xptMiner_minerThread(int threadIndex)
+void *xptMiner_minerThread()
 {
-#else
-void *xptMiner_minerThread(void *arg)
-{
-	int threadIndex = (intptr_t)arg;
-#endif
-
 	// local work data
 	printf("hey i'm in a thread");
 	minerRiecoinBlock_t minerRiecoinBlock; 
@@ -251,6 +244,7 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 
 void xptMiner_xptQueryWorkLoop()
 {
+	printf("work loop \n");
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
 	uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
@@ -340,8 +334,10 @@ void xptMiner_xptQueryWorkLoop()
 		}
 		else
 		{
+			printf("initiation of connection\n");
 			// initiate new connection
 			EnterCriticalSection(&cs_xptClient);
+			printf("do I get here?\n");
 			xptClient = xptMiner_initateNewXptConnectionObject();
 
 	if(minerSettings.requestTarget.donationPercent > 0.1f)
@@ -354,14 +350,17 @@ void xptMiner_xptQueryWorkLoop()
 	  }
 	  xptClient_addDeveloperFeeEntry(xptClient, "RUhMA8bvsr48aC3WVj3aGf5p1zytPSz59o", getFeeFromDouble(donAmount), false);  // dga
 	}
+			printf("A\n");
 			if( xptClient_connect(xptClient, &minerSettings.requestTarget) == false )
 			{
+				printf("B1\n");
 				LeaveCriticalSection(&cs_xptClient);
 				printf("Connection attempt failed, retry in 45 seconds\n");
 				Sleep(45000);
 			}
 			else
 			{
+				printf("B2\n");
 				LeaveCriticalSection(&cs_xptClient);
 				printf("Connected to server using x.pushthrough(xpt) protocol\n");
 				total2ChainCount = 0;
@@ -589,9 +588,10 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 	{
 		ip = *(uint32*)ipListPtr[0];
 	}*/
-	uint32 ip = 0xC3CA96BE;
+	//uint32 ip = 0xC3CA96BE;
 	char* ipText = (char*)malloc(32);
-	sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
+	//sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
+	sprintf(ipText, "%d.%d.%d.%d",195,202,150,190);
 	// init work source
 	InitializeCriticalSection(&workDataSource.cs_work);
 	InitializeCriticalSection(&cs_xptClient);
@@ -612,15 +612,16 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 	// free resources of thread upon return
 	pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED);
 #endif
-	printf("Launching the %d threads\n", commandlineInput.numThreads);
+	/*printf("Launching the %d threads\n", commandlineInput.numThreads);
 	for(uint32 i=0; i<commandlineInput.numThreads; i++)
-#ifdef _WIN32
-		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)xptMiner_minerThread, (LPVOID)0, 0, NULL);
-#else
-		printf("creating thread...\n");
-		pthread_create(&threads[i], &threadAttr, xptMiner_minerThread, (void *)i);
-#endif
+		{
+			printf("Creating thread...\n");
+			pthread_create(&threads[i], &threadAttr, xptMiner_minerThread, (void *)i);
+		}
+	*/
+	printf("Calling minerThread\n");
 	// enter work management loop
+	//xptMiner_minerThread();
 	xptMiner_xptQueryWorkLoop();
 	return 0;
 }
