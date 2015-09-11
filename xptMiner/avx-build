@@ -1,0 +1,7 @@
+#!/bin/sh
+VERSION=b15
+MAKEFLAGS=-j4
+
+make ${MAKEFLAGS} -f Makefile BUILD_ARCH='-msse4 -mavx -static'
+strip xptminer
+mv -f xptminer xptminer-avx-${VERSION}
