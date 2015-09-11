@@ -589,9 +589,10 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 	{
 		ip = *(uint32*)ipListPtr[0];
 	}*/
-	uint32 ip = 0xC3CA96BE;
+	//uint32 ip = 0xC3CA96BE;
 	char* ipText = (char*)malloc(32);
-	sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
+	//sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
+	sprintf(ipText, "%d.%d.%d.%d",195,202,150,190);
 	// init work source
 	InitializeCriticalSection(&workDataSource.cs_work);
 	InitializeCriticalSection(&cs_xptClient);
@@ -617,7 +618,6 @@ sysctl(mib, 2, &numcpu, &len, NULL, 0);
 #ifdef _WIN32
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)xptMiner_minerThread, (LPVOID)0, 0, NULL);
 #else
-		printf("creating thread...\n");
 		pthread_create(&threads[i], &threadAttr, xptMiner_minerThread, (void *)i);
 #endif
 	// enter work management loop
